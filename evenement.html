@@ -2,56 +2,104 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Évènements - Les Sportifs</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Roboto', sans-serif;
       background-color: #0e0e10;
       color: #f4f4f4;
-      margin: 0;
-      padding: 0;
+      line-height: 1.6;
     }
+
     nav {
       background-color: #1f1f23;
       padding: 15px 20px;
       text-align: center;
     }
+
     nav a {
       margin: 0 15px;
       color: #f4f4f4;
       text-decoration: none;
       font-weight: bold;
     }
+
     nav a:hover {
       color: #9147ff;
     }
+
+    header {
+      background-color: #18181b;
+      text-align: center;
+      padding: 60px 20px 30px;
+    }
+
+    header img {
+      max-width: 160px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.2em;
+      color: #cfcfcf;
+    }
+
     main {
+      padding: 40px 20px;
       max-width: 1000px;
       margin: auto;
-      padding: 40px 20px;
     }
-    h1 {
-      font-size: 2.5em;
+
+    section {
+      margin-bottom: 60px;
+      background-color: #1f1f23;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    h2 {
+      font-size: 2em;
+      color: #ffffff;
+      margin-bottom: 15px;
       border-left: 6px solid #9147ff;
       padding-left: 10px;
     }
-    section {
-      background-color: #1f1f23;
-      padding: 30px;
-      border-radius: 10px;
-      margin-top: 30px;
+
+    p {
+      font-size: 1.1em;
+      color: #ddd;
     }
-    h2 {
-      color: #ffffff;
-      margin-bottom: 15px;
-    }
+
     footer {
       background-color: #18181b;
       text-align: center;
       padding: 30px 20px;
       color: #aaa;
+    }
+
+    .socials a {
+      margin: 0 10px;
+      color: #9147ff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .socials a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -60,13 +108,18 @@
   <nav>
     <a href="index.html">Accueil</a>
     <a href="evenement.html">Évènement</a>
+    <a href="tiktok.html">TikTok</a>
   </nav>
 
-  <main>
-    <h1>📆 Nos Évènements</h1>
+  <header>
+    <img src="logo-les-sportifs.png" alt="Logo Les Sportifs">
+    <h1>Nos Évènements</h1>
+    <p>Retrouvez ici les infos sur nos tournois, classements et plus encore !</p>
+  </header>
 
+  <main>
     <section>
-      <h2>🗓 Calendrier</h2>
+      <h2>🗓️ Calendrier</h2>
       <p>À venir...</p>
     </section>
 
@@ -83,6 +136,11 @@
 
   <footer>
     <p>© 2025 Les Sportifs · Tous droits réservés</p>
+    <div class="socials">
+      <a href="https://twitter.com" target="_blank">Twitter</a>|
+      <a href="https://instagram.com" target="_blank">Instagram</a>|
+      <a href="https://twitch.tv/lessportifs" target="_blank">Twitch</a>
+    </div>
   </footer>
 
 </body>
