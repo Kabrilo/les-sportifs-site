@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
->
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,37 +13,33 @@
       padding: 0;
       text-align: center;
     }
-
     h1 {
       padding: 30px 0;
       color: #9147ff;
     }
-
     .wheel-wrapper {
       position: relative;
       display: inline-block;
       margin-bottom: 50px;
     }
-
     .pointer {
       position: absolute;
-      top: -10px;
+      top: -20px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 25px solid #ff4757;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid #ff4757;
       z-index: 10;
     }
-
     canvas {
       border-radius: 50%;
       background: #18181b;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
     }
-
-    button {
+    button, select {
       margin-top: 20px;
       background-color: #9147ff;
       border: none;
@@ -54,25 +49,26 @@
       border-radius: 8px;
       cursor: pointer;
       transition: 0.3s;
+      font-size: 1em;
     }
-
-    button:hover {
+    button:hover, select:hover {
       background-color: #772ce8;
+    }
+    select {
+      margin-top: 40px;
     }
   </style>
 </head>
 <body>
 
   <h1>🎡 Roue des Streams</h1>
-
   <div class="wheel-wrapper">
     <div class="pointer"></div>
     <canvas id="wheel" width="400" height="400"></canvas><br>
     <select id="wheelType">
       <option value="F1">Roue F1 24</option>
       <option value="FC">Roue EAFC 25</option>
-    </select>
-    <br>
+    </select><br>
     <button onclick="spinWheel()">🎯 Lancer la roue</button>
   </div>
 
@@ -83,73 +79,9 @@
     let angle = 0;
 
     const data = {
-      F1: [...`Sutter termine P5 ou mieux.|Sutter gagne une course.|Sutter termine P15 ou pire.|Sutter se qualifie en pole position.|Sutter abandonne après un accident.|Leblanc gagne une course contre toute attente.|Leblanc se qualifie devant Sutter.|Sutter dépasse Leblanc pour la victoire.|Sutter et Leblanc sont tous deux dans le top 5.|Leblanc abandonne (DNF) à cause d’un problème moteur.`.split('|')],
-      FC: [...`AGL marque un but.|Abdoulaye marque un triplé.|AGL reçoit un carton rouge.|Abdoulaye rate un penalty.|AGL réussit une interception clé.|Abdoulaye inscrit un CSC.|AGL provoque un penalty.|Abdoulaye se blesse.|AGL marque dans les arrêts de jeu.|Abdoulaye tire sur la barre.`.split('|')]
+      F1: `Sutter termine P5 ou mieux.|Sutter termine P10 ou mieux.|Sutter réalise le meilleur tour.|Sutter termine sur le podium (P3 ou mieux).|Sutter gagne une course.|Sutter abandonne à cause d’un problème moteur.|Sutter abandonne après un accident.|Sutter termine en dehors du top 10.|Sutter termine P15 ou pire.|Sutter dépasse Leblanc en course.|Sutter est dépassé par Leblanc.|Sutter rate la qualification pour Q3.|Sutter se qualifie en pole position.|Sutter termine P4.|Sutter termine P6.|Sutter termine P7.|Sutter termine P8.|Sutter termine P9.|Sutter termine dernier après un problème mécanique.|Sutter reçoit une pénalité de temps.|Sutter reçoit une pénalité sur grille pour changement de moteur.|Sutter est impliqué dans un accrochage avec Leblanc.|Sutter réalise une stratégie à un arrêt gagnante.|Sutter perd des positions après un arrêt au stand lent.|Sutter gagne des positions grâce à la stratégie sous Safety Car.|Sutter est éliminé en Q1 lors des qualifications.|Sutter est éliminé en Q2 lors des qualifications.|Sutter réalise un dépassement spectaculaire au virage 1.|Sutter est victime d’une crevaison en course.|Sutter termine à moins de 2 secondes du vainqueur.|Leblanc abandonne (DNF) à cause d’un problème moteur.|Leblanc abandonne après un accident au départ.|Leblanc termine dans les points (P10 ou mieux).|Leblanc termine hors des points (P11 ou pire).|Leblanc réalise le meilleur tour en course.|Leblanc se qualifie devant Sutter.|Leblanc est dépassé par plusieurs pilotes dans le dernier tour.|Leblanc termine P5 ou mieux.|Leblanc termine P15 ou pire après des problèmes techniques.|Leblanc reçoit une pénalité de temps pour non-respect des limites de piste.|Leblanc reçoit une pénalité sur grille pour changement de boîte de vitesses.|Leblanc gagne une course contre toute attente.|Leblanc réalise une stratégie sous Safety Car parfaite et gagne des places.|Leblanc perd plusieurs positions après un arrêt au stand raté.|Leblanc dépasse plusieurs pilotes dans les derniers tours pour finir dans les points.|Leblanc est impliqué dans un accrochage avec un autre pilote (pas avec Sutter).|Leblanc se qualifie en pole position pour la première fois de sa carrière.|Leblanc rate son départ et perd plusieurs places au premier tour.|Leblanc est éliminé en Q1 lors des qualifications après une erreur stratégique de l'équipe.|Leblanc est éliminé en Q2 lors des qualifications malgré un bon rythme en essais libres.|Sutter termine P1 et Leblanc P2.|Leblanc termine P10 et Sutter P11.|Sutter et Leblanc sont tous deux dans les points.|Sutter et Leblanc abandonnent tous deux.|Sutter dépasse Leblanc pour la victoire.|Leblanc dépasse Sutter pour la deuxième place.|Sutter et Leblanc se qualifient tous deux en Q3.|Sutter et Leblanc sont éliminés en Q1.|Sutter termine P3 et Leblanc P4.|Leblanc termine P5 et Sutter P6.|Sutter gagne sous Safety Car.|Leblanc perd des positions sous Safety Car.|Sutter réalise un hat-trick (victoire, pole, meilleur tour).|Leblanc réalise un podium surprise.|Sutter et Leblanc sont tous deux dans le top 5.|Sutter et Leblanc sont tous deux hors du top 10.|Sutter reçoit une pénalité pour avoir dépassé les limites de piste.|Leblanc reçoit une pénalité pour avoir gêné un autre pilote.|Sutter termine P2 et Leblanc P3.|Leblanc termine P1 et Sutter P2.|Sutter se qualifie en deuxième position.|Leblanc se qualifie en troisième position.|Sutter réalise un dépassement spectaculaire sur un autre pilote.|Leblanc est victime d’une crevaison en qualifications.|Sutter termine à moins de 1 seconde du vainqueur.|Leblanc termine à plus de 1 minute du vainqueur.|Sutter gagne avec une stratégie à deux arrêts.|Leblanc perd des positions après un arrêt raté.|Sutter et Leblanc sont tous deux dans le top 3.|Sutter et Leblanc sont tous deux hors du top 5.|Sutter est impliqué dans un accrochage avec un autre pilote.|Leblanc est impliqué dans un accrochage avec un autre pilote.|Sutter réalise un record personnel en qualifications.|Leblanc réalise un record personnel en course.|Sutter termine P4 et Leblanc P5.|Leblanc termine P6 et Sutter P7.|Sutter gagne avec une stratégie à un arrêt.|Leblanc perd des positions après un problème mécanique.|Sutter et Leblanc sont tous deux dans le top 10.|Sutter et Leblanc sont tous deux hors du top 15.|Sutter réalise un dépassement spectaculaire sur Leblanc.|Leblanc réalise un dépassement spectaculaire sur Sutter.|Sutter termine P8 et Leblanc P9.|Leblanc termine P10 et Sutter P11.|Sutter reçoit une pénalité pour avoir gêné un autre pilote.|Leblanc reçoit une pénalité pour avoir dépassé les limites de piste.|Sutter termine à moins de 5 secondes du vainqueur.|Leblanc termine à plus de 2 tours du vainqueur.|Sutter gagne avec une stratégie sous Safety Car.|Leblanc perd des positions après un problème avec ses pneus.`.split('|'),
+      FC: [...`AGL marque un but.|Abdoulaye marque un but.|AGL réalise une passe décisive.|Abdoulaye réalise une passe décisive.|AGL rate un penalty.|Abdoulaye rate un penalty.|AGL marque un doublé.|Abdoulaye marque un doublé.|AGL marque un triplé (hat-trick).|Abdoulaye marque un triplé (hat-trick).|AGL reçoit un carton jaune.|Abdoulaye reçoit un carton jaune.|AGL reçoit un carton rouge.|Abdoulaye reçoit un carton rouge.|AGL marque un but de la tête.|Abdoulaye marque un but de la tête.|AGL marque sur coup franc direct.|Abdoulaye marque sur coup franc direct.|AGL réussit une interception clé en défense.|Abdoulaye réussit une interception clé en défense.|AGL perd la balle en position dangereuse, menant à un but adverse.|Abdoulaye perd la balle en position dangereuse, menant à un but adverse.|AGL fait une passe clé qui mène au but d’un coéquipier.|Abdoulaye fait une passe clé qui mène au but d’un coéquipier.|AGL réussit une roulette pour éliminer un adversaire.|Abdoulaye réussit une roulette pour éliminer un adversaire.|AGL tente mais rate un geste technique spectaculaire (arc-en-ciel, sombrero…).|Abdoulaye tente mais rate un geste technique spectaculaire (arc-en-ciel, sombrero…).|AGL provoque un penalty pour son équipe.|Abdoulaye provoque un penalty pour son équipe.|AGL provoque un penalty contre son équipe (faute dans la surface).|Abdoulaye provoque un penalty contre son équipe (faute dans la surface).|AGL marque dans les dernières minutes du match pour offrir la victoire à son équipe.|Abdoulaye marque dans les dernières minutes du match pour offrir la victoire à son équipe.|AGL inscrit un but contre son camp (CSC).|Abdoulaye inscrit un but contre son camp (CSC).|AGL effectue une série de dribbles impressionnants avant de marquer.|Abdoulaye effectue une série de dribbles impressionnants avant de marquer.|AGL réussit 90 % ou plus de ses passes dans le match.|Abdoulaye réussit 90 % ou plus de ses passes dans le match.|AGL tire sur le poteau ou la barre transversale sans marquer.|Abdoulaye tire sur le poteau ou la barre transversale sans marquer.|AGL est élu homme du match par EA FC 25 après une performance exceptionnelle.|Abdoulaye est élu homme du match par EA FC 25 après une performance exceptionnelle.|AGL réalise une série de tacles parfaits en défense durant le match.|Abdoulaye réalise une série de tacles parfaits en défense durant le match.|AGL est hors-jeu à plusieurs reprises durant le match.|Abdoulaye est hors-jeu à plusieurs reprises durant le match.|AGL marque depuis l’extérieur de la surface avec une frappe puissante.|Abdoulaye marque depuis l’extérieur de la surface avec une frappe puissante.|AGL inscrit un but après avoir dribblé le gardien adverse.|Abdoulaye inscrit un but après avoir dribblé le gardien adverse.|AGL manque complètement une occasion facile devant les buts vides.|Abdoulaye manque complètement une occasion facile devant les buts vides.|AGL fait gagner son équipe grâce à un but en or (prolongations).|Abdoulaye fait gagner son équipe grâce à un but en or (prolongations).|AGL se blesse pendant le match et doit quitter le terrain (simulation EA FC).|Abdoulaye se blesse pendant le match et doit quitter le terrain (simulation EA FC).|AGL effectue une passe décisive avec une talonnade spectaculaire.|Abdoulaye effectue une passe décisive avec une talonnade spectaculaire.|AGL provoque l’expulsion d’un adversaire après avoir subi une faute grave.|Abdoulaye provoque l’expulsion d’un adversaire après avoir subi une faute grave.|AGL réalise deux passes décisives dans le même match.|Abdoulaye réalise deux passes décisives dans le même match.|AGL rate complètement sa frappe et envoie le ballon loin du cadre des buts adverses.|Abdoulaye rate complètement sa frappe et envoie le ballon loin du cadre des buts adverses.|AGL sauve son équipe avec un dégagement sur la ligne de but adverse ou défensive !|Abdoulaye sauve son équipe avec un dégagement sur la ligne de but adverse ou défensive !`.split('|')]
     };
-
-    function drawWheel(options, rotation) {
-      const radius = wheelCanvas.width / 2;
-      const step = (2 * Math.PI) / options.length;
-
-      ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-      ctx.save();
-      ctx.translate(radius, radius);
-      ctx.rotate(rotation);
-
-      options.forEach((opt, i) => {
-        ctx.beginPath();
-        ctx.fillStyle = i % 2 === 0 ? '#9147ff' : '#772ce8';
-        ctx.moveTo(0, 0);
-        ctx.arc(0, 0, radius, step * i, step * (i + 1));
-        ctx.fill();
-
-        ctx.save();
-        ctx.rotate(step * i + step / 2);
-        ctx.translate(radius - 20, 0);
-        ctx.rotate(Math.PI / 2);
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 13px Arial';
-        ctx.fillText(opt.slice(0, 35) + (opt.length > 35 ? '…' : ''), 0, 0);
-        ctx.restore();
-      });
-
-      ctx.restore();
-    }
-
-    function spinWheel() {
-      if (spinning) return;
-      spinning = true;
-      const selected = document.getElementById('wheelType').value;
-      const items = data[selected];
-      let velocity = Math.random() * 0.3 + 0.25;
-      let duration = 0;
-
-      function animate() {
-        duration += 1;
-        angle += velocity;
-        velocity *= 0.985;
-        drawWheel(items, angle);
-
-        if (velocity < 0.002) {
-          const selectedIndex = Math.floor(((2 * Math.PI - (angle % (2 * Math.PI))) / (2 * Math.PI)) * items.length) % items.length;
-          const result = items[selectedIndex];
-          setTimeout(() => {
-            alert('🎯 Résultat : ' + result);
-            spinning = false;
-          }, 300);
-        } else {
-          requestAnimationFrame(animate);
-        }
-      }
-
-      animate();
-    }
-
-    drawWheel(data.F1, 0);
-    document.getElementById('wheelType').addEventListener('change', () => {
-      angle = 0;
-      drawWheel(data[document.getElementById('wheelType').value], 0);
-    });
   </script>
 </body>
 </html>
