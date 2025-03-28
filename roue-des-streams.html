@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
+>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Roue des Streams</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background: #0e0e10;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0e0e10;
       color: #f4f4f4;
       margin: 0;
       padding: 0;
@@ -20,9 +20,23 @@
       color: #9147ff;
     }
 
-    .wheel-container {
-      margin: 40px auto;
-      width: 320px;
+    .wheel-wrapper {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 50px;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid #ff4757;
+      z-index: 10;
     }
 
     canvas {
@@ -50,90 +64,92 @@
 <body>
 
   <h1>🎡 Roue des Streams</h1>
-  <div class="wheel-section">
-    <h2>🚗 Roue F1 24</h2>
-    <div class="wheel-container">
-      <canvas id="wheelF1" width="300" height="300"></canvas><br>
-      <button onclick="spin('F1')">Lancer la roue</button>
-    </div>
-  </div>
 
-  <div class="wheel-section">
-    <h2>⚽ Roue EAFC 25</h2>
-    <div class="wheel-container">
-      <canvas id="wheelFC" width="300" height="300"></canvas><br>
-      <button onclick="spin('FC')">Lancer la roue</button>
-    </div>
+  <div class="wheel-wrapper">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="400" height="400"></canvas><br>
+    <select id="wheelType">
+      <option value="F1">Roue F1 24</option>
+      <option value="FC">Roue EAFC 25</option>
+    </select>
+    <br>
+    <button onclick="spinWheel()">🎯 Lancer la roue</button>
   </div>
 
   <script>
-    const wheels = {
-      F1: {
-        canvas: document.getElementById('wheelF1'),
-        items: [...`Sutter termine P5 ou mieux.|Sutter termine P10 ou mieux.|Sutter réalise le meilleur tour.|Sutter termine sur le podium (P3 ou mieux).|Sutter gagne une course.|Sutter abandonne à cause d’un problème moteur.|Sutter abandonne après un accident.|Sutter termine en dehors du top 10.|Sutter termine P15 ou pire.|Sutter dépasse Leblanc en course.|Sutter est dépassé par Leblanc.|Sutter rate la qualification pour Q3.|Sutter se qualifie en pole position.|Sutter termine P4.|Sutter termine P6.|Sutter termine P7.|Sutter termine P8.|Sutter termine P9.|Sutter termine dernier après un problème mécanique.|Sutter reçoit une pénalité de temps.|Sutter reçoit une pénalité sur grille pour changement de moteur.|Sutter est impliqué dans un accrochage avec Leblanc.|Sutter réalise une stratégie à un arrêt gagnante.|Sutter perd des positions après un arrêt au stand lent.|Sutter gagne des positions grâce à la stratégie sous Safety Car.|Sutter est éliminé en Q1 lors des qualifications.|Sutter est éliminé en Q2 lors des qualifications.|Sutter réalise un dépassement spectaculaire au virage 1.|Sutter est victime d’une crevaison en course.|Sutter termine à moins de 2 secondes du vainqueur.|Leblanc abandonne (DNF) à cause d’un problème moteur.|Leblanc abandonne après un accident au départ.|Leblanc termine dans les points (P10 ou mieux).|Leblanc termine hors des points (P11 ou pire).|Leblanc réalise le meilleur tour en course.|Leblanc se qualifie devant Sutter.|Leblanc est dépassé par plusieurs pilotes dans le dernier tour.|Leblanc termine P5 ou mieux.|Leblanc termine P15 ou pire après des problèmes techniques.|Leblanc reçoit une pénalité de temps pour non-respect des limites de piste.|Leblanc reçoit une pénalité sur grille pour changement de boîte de vitesses.|Leblanc gagne une course contre toute attente.|Leblanc réalise une stratégie sous Safety Car parfaite et gagne des places.|Leblanc perd plusieurs positions après un arrêt au stand raté.|Leblanc dépasse plusieurs pilotes dans les derniers tours pour finir dans les points.|Leblanc est impliqué dans un accrochage avec un autre pilote (pas avec Sutter).|Leblanc se qualifie en pole position pour la première fois de sa carrière.|Leblanc rate son départ et perd plusieurs places au premier tour.|Leblanc est éliminé en Q1 lors des qualifications après une erreur stratégique de l'équipe.|Leblanc est éliminé en Q2 lors des qualifications malgré un bon rythme en essais libres.`.split('|')]
-      },
-      FC: {
-        canvas: document.getElementById('wheelFC'),
-        items: [...`AGL marque un but.|Abdoulaye marque un but.|AGL réalise une passe décisive.|Abdoulaye réalise une passe décisive.|AGL rate un penalty.|Abdoulaye rate un penalty.|AGL marque un doublé.|Abdoulaye marque un doublé.|AGL marque un triplé (hat-trick).|Abdoulaye marque un triplé (hat-trick).|AGL reçoit un carton jaune.|Abdoulaye reçoit un carton jaune.|AGL reçoit un carton rouge.|Abdoulaye reçoit un carton rouge.|AGL marque un but de la tête.|Abdoulaye marque un but de la tête.|AGL marque sur coup franc direct.|Abdoulaye marque sur coup franc direct.|AGL réussit une interception clé en défense.|Abdoulaye réussit une interception clé en défense.|AGL perd la balle en position dangereuse.|Abdoulaye perd la balle en position dangereuse.|AGL provoque un penalty.|Abdoulaye provoque un penalty.|AGL fait gagner son équipe dans les arrêts de jeu.|Abdoulaye fait gagner son équipe dans les arrêts de jeu.`.split('|')]
-      }
+    const wheelCanvas = document.getElementById('wheel');
+    const ctx = wheelCanvas.getContext('2d');
+    let spinning = false;
+    let angle = 0;
+
+    const data = {
+      F1: [...`Sutter termine P5 ou mieux.|Sutter gagne une course.|Sutter termine P15 ou pire.|Sutter se qualifie en pole position.|Sutter abandonne après un accident.|Leblanc gagne une course contre toute attente.|Leblanc se qualifie devant Sutter.|Sutter dépasse Leblanc pour la victoire.|Sutter et Leblanc sont tous deux dans le top 5.|Leblanc abandonne (DNF) à cause d’un problème moteur.`.split('|')],
+      FC: [...`AGL marque un but.|Abdoulaye marque un triplé.|AGL reçoit un carton rouge.|Abdoulaye rate un penalty.|AGL réussit une interception clé.|Abdoulaye inscrit un CSC.|AGL provoque un penalty.|Abdoulaye se blesse.|AGL marque dans les arrêts de jeu.|Abdoulaye tire sur la barre.`.split('|')]
     };
 
-    function drawWheel(ctx, items, rotation) {
-      const total = items.length;
-      const angle = (2 * Math.PI) / total;
-      const radius = 150;
-      ctx.clearRect(0, 0, 300, 300);
+    function drawWheel(options, rotation) {
+      const radius = wheelCanvas.width / 2;
+      const step = (2 * Math.PI) / options.length;
+
+      ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
       ctx.save();
-      ctx.translate(150, 150);
+      ctx.translate(radius, radius);
       ctx.rotate(rotation);
-      items.forEach((item, i) => {
+
+      options.forEach((opt, i) => {
         ctx.beginPath();
-        ctx.moveTo(0, 0);
         ctx.fillStyle = i % 2 === 0 ? '#9147ff' : '#772ce8';
-        ctx.arc(0, 0, radius, i * angle, (i + 1) * angle);
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, step * i, step * (i + 1));
         ctx.fill();
+
+        ctx.save();
+        ctx.rotate(step * i + step / 2);
+        ctx.translate(radius - 20, 0);
+        ctx.rotate(Math.PI / 2);
         ctx.fillStyle = '#fff';
-        ctx.rotate(angle / 2);
-        ctx.textAlign = 'right';
-        ctx.font = '12px Roboto';
-        ctx.fillText(item.substring(0, 25) + (item.length > 25 ? '…' : ''), radius - 10, 4);
-        ctx.rotate(angle / 2);
+        ctx.font = 'bold 13px Arial';
+        ctx.fillText(opt.slice(0, 35) + (opt.length > 35 ? '…' : ''), 0, 0);
+        ctx.restore();
       });
+
       ctx.restore();
     }
 
-    let spinning = false;
-    function spin(type) {
+    function spinWheel() {
       if (spinning) return;
       spinning = true;
-      const wheel = wheels[type];
-      const ctx = wheel.canvas.getContext('2d');
-      let rotation = 0;
-      let speed = Math.random() * 0.2 + 0.25;
-      let duration = 3000 + Math.random() * 1000;
-      const start = performance.now();
-      const total = wheel.items.length;
+      const selected = document.getElementById('wheelType').value;
+      const items = data[selected];
+      let velocity = Math.random() * 0.3 + 0.25;
+      let duration = 0;
 
-      (function animate(time) {
-        const elapsed = time - start;
-        rotation += speed;
-        speed *= 0.98;
-        drawWheel(ctx, wheel.items, rotation);
-        if (elapsed < duration || speed > 0.002) {
-          requestAnimationFrame(animate);
-        } else {
-          const index = Math.floor((total - (rotation / (2 * Math.PI)) * total) % total);
-          const result = wheel.items[index];
+      function animate() {
+        duration += 1;
+        angle += velocity;
+        velocity *= 0.985;
+        drawWheel(items, angle);
+
+        if (velocity < 0.002) {
+          const selectedIndex = Math.floor(((2 * Math.PI - (angle % (2 * Math.PI))) / (2 * Math.PI)) * items.length) % items.length;
+          const result = items[selectedIndex];
           setTimeout(() => {
             alert('🎯 Résultat : ' + result);
             spinning = false;
           }, 300);
+        } else {
+          requestAnimationFrame(animate);
         }
-      })(performance.now());
+      }
+
+      animate();
     }
 
-    drawWheel(wheels.F1.canvas.getContext('2d'), wheels.F1.items, 0);
-    drawWheel(wheels.FC.canvas.getContext('2d'), wheels.FC.items, 0);
+    drawWheel(data.F1, 0);
+    document.getElementById('wheelType').addEventListener('change', () => {
+      angle = 0;
+      drawWheel(data[document.getElementById('wheelType').value], 0);
+    });
   </script>
 </body>
 </html>
