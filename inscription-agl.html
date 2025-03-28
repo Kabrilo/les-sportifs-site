@@ -78,13 +78,45 @@
       margin-top: 10px;
       text-align: center;
     }
+
+    .confirmation {
+      display: none;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .confirmation h2 {
+      color: #28d17c;
+    }
+
+    .confirmation p {
+      font-size: 1.1em;
+    }
   </style>
+  <script>
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const data = new FormData(form);
+      fetch(form.action, {
+        method: form.method,
+        body: data,
+        headers: { 'Accept': 'application/json' },
+      }).then(() => {
+        form.style.display = 'none';
+        document.querySelector('.confirmation').style.display = 'block';
+      }).catch((error) => {
+        alert("Une erreur est survenue. Veuillez réessayer.");
+        console.error(error);
+      });
+    }
+  </script>
 </head>
 <body>
 
   <h1>Inscription - AGL CUP F1 24</h1>
 
-  <form name="inscription-agl" method="POST" data-netlify="true" action="/success.html">
+  <form name="inscription-agl" method="POST" data-netlify="true" onsubmit="handleFormSubmit(event)">
     <input type="hidden" name="form-name" value="inscription-agl">
 
     <label for="nom">Nom :</label>
@@ -116,8 +148,13 @@
     </div>
 
     <input class="submit-btn" type="submit" value="Envoyer">
-    <p class="note">Les informations seront envoyées via Netlify Forms. Vous serez redirigé après envoi.</p>
+    <p class="note">Les informations seront envoyées via Netlify Forms.</p>
   </form>
+
+  <div class="confirmation">
+    <h2>✅ Inscription envoyée avec succès !</h2>
+    <p>Merci pour ton inscription à l’AGL CUP F1 24.<br>On te recontacte très bientôt via Discord !</p>
+  </div>
 
 </body>
 </html>
