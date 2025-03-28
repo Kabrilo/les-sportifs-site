@@ -84,7 +84,9 @@
 
   <h1>Inscription - AGL CUP F1 24</h1>
 
-  <form action="mailto:pochcarole05@gmail.com" method="POST" enctype="text/plain">
+  <form name="inscription-agl" method="POST" data-netlify="true">
+    <input type="hidden" name="form-name" value="inscription-agl">
+
     <label for="nom">Nom :</label>
     <input type="text" id="nom" name="Nom" required>
 
@@ -114,7 +116,7 @@
     </div>
 
     <input class="submit-btn" type="submit" value="Envoyer">
-    <p class="note">En cliquant sur \"Envoyer\", un e-mail sera généré via votre logiciel de messagerie par défaut.</p>
+    <p class="note">Les informations seront envoyées via Netlify Forms.</p>
   </form>
 
 </body>
