@@ -20,11 +20,8 @@
     .wheel-container {
       margin: auto;
       width: 100%;
-      max-width: 500px;
+      max-width: 600px;
       position: relative;
-    }
-    #wheel {
-      width: 100%;
     }
     .pointer {
       width: 0;
@@ -36,6 +33,14 @@
       top: -30px;
       left: 50%;
       transform: translateX(-50%);
+      z-index: 2;
+    }
+    #wheelCanvas {
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      transform-origin: center center;
+      transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
     }
     button, select {
       margin-top: 30px;
@@ -66,44 +71,66 @@
 
   <div class="wheel-container">
     <div class="pointer"></div>
-    <svg id="wheel" viewBox="0 0 500 500"></svg>
+    <canvas id="wheelCanvas" width="600" height="600"></canvas>
   </div>
 
   <script>
-    const wheel = document.getElementById("wheel");
+    const wheelCanvas = document.getElementById("wheelCanvas");
+    const ctx = wheelCanvas.getContext("2d");
     const wheelType = document.getElementById("wheelType");
+    let currentAngle = 0;
+    let spinning = false;
 
     const data = {
-      F1: [...`Sutter termine P5 ou mieux.|Sutter termine P10 ou mieux.|Sutter réalise le meilleur tour.|Sutter termine sur le podium (P3 ou mieux).|Sutter gagne une course.|Sutter abandonne à cause d’un problème moteur.|Sutter abandonne après un accident.|Sutter termine en dehors du top 10.|Sutter termine P15 ou pire.|Sutter dépasse Leblanc en course.|Sutter est dépassé par Leblanc.|Sutter rate la qualification pour Q3.|Sutter se qualifie en pole position.|Sutter termine P4.|Sutter termine P6.|Sutter termine P7.|Sutter termine P8.|Sutter termine P9.|Sutter termine dernier après un problème mécanique.|Sutter reçoit une pénalité de temps.|Sutter reçoit une pénalité sur grille pour changement de moteur.|Sutter est impliqué dans un accrochage avec Leblanc.|Sutter réalise une stratégie à un arrêt gagnante.|Sutter perd des positions après un arrêt au stand lent.|Sutter gagne des positions grâce à la stratégie sous Safety Car.|Sutter est éliminé en Q1 lors des qualifications.|Sutter est éliminé en Q2 lors des qualifications.|Sutter réalise un dépassement spectaculaire au virage 1.|Sutter est victime d’une crevaison en course.|Sutter termine à moins de 2 secondes du vainqueur.|Leblanc abandonne (DNF) à cause d’un problème moteur.|Leblanc abandonne après un accident au départ.|Leblanc termine dans les points (P10 ou mieux).|Leblanc termine hors des points (P11 ou pire).|Leblanc réalise le meilleur tour en course.|Leblanc se qualifie devant Sutter.|Leblanc est dépassé par plusieurs pilotes dans le dernier tour.|Leblanc termine P5 ou mieux.|Leblanc termine P15 ou pire après des problèmes techniques.|Leblanc reçoit une pénalité de temps pour non-respect des limites de piste.|Leblanc reçoit une pénalité sur grille pour changement de boîte de vitesses.|Leblanc gagne une course contre toute attente.|Leblanc réalise une stratégie sous Safety Car parfaite et gagne des places.|Leblanc perd plusieurs positions après un arrêt au stand raté.|Leblanc dépasse plusieurs pilotes dans les derniers tours pour finir dans les points.|Leblanc est impliqué dans un accrochage avec un autre pilote (pas avec Sutter).|Leblanc se qualifie en pole position pour la première fois de sa carrière.|Leblanc rate son départ et perd plusieurs places au premier tour.|Leblanc est éliminé en Q1 lors des qualifications après une erreur stratégique de l'équipe.|Leblanc est éliminé en Q2 lors des qualifications malgré un bon rythme en essais libres.|Sutter termine P1 et Leblanc P2.|Leblanc termine P10 et Sutter P11.|Sutter et Leblanc sont tous deux dans les points.|Sutter et Leblanc abandonnent tous deux.|Sutter dépasse Leblanc pour la victoire.|Leblanc dépasse Sutter pour la deuxième place.|Sutter et Leblanc se qualifient tous deux en Q3.|Sutter et Leblanc sont éliminés en Q1.|Sutter termine P3 et Leblanc P4.|Leblanc termine P5 et Sutter P6.|Sutter gagne sous Safety Car.|Leblanc perd des positions sous Safety Car.|Sutter réalise un hat-trick (victoire, pole, meilleur tour).|Leblanc réalise un podium surprise.|Sutter et Leblanc sont tous deux dans le top 5.|Sutter et Leblanc sont tous deux hors du top 10.|Sutter reçoit une pénalité pour avoir dépassé les limites de piste.|Leblanc reçoit une pénalité pour avoir gêné un autre pilote.|Sutter termine P2 et Leblanc P3.|Leblanc termine P1 et Sutter P2.|Sutter se qualifie en deuxième position.|Leblanc se qualifie en troisième position.|Sutter réalise un dépassement spectaculaire sur un autre pilote.|Leblanc est victime d’une crevaison en qualifications.|Sutter termine à moins de 1 seconde du vainqueur.|Leblanc termine à plus de 1 minute du vainqueur.|Sutter gagne avec une stratégie à deux arrêts.|Leblanc perd des positions après un arrêt raté.|Sutter et Leblanc sont tous deux dans le top 3.|Sutter et Leblanc sont tous deux hors du top 5.|Sutter est impliqué dans un accrochage avec un autre pilote.|Leblanc est impliqué dans un accrochage avec un autre pilote.|Sutter réalise un record personnel en qualifications.|Leblanc réalise un record personnel en course.|Sutter termine P4 et Leblanc P5.|Leblanc termine P6 et Sutter P7.|Sutter gagne avec une stratégie à un arrêt.|Leblanc perd des positions après un problème mécanique.|Sutter et Leblanc sont tous deux dans le top 10.|Sutter et Leblanc sont tous deux hors du top 15.|Sutter réalise un dépassement spectaculaire sur Leblanc.|Leblanc réalise un dépassement spectaculaire sur Sutter.|Sutter termine P8 et Leblanc P9.|Leblanc termine P10 et Sutter P11.|Sutter reçoit une pénalité pour avoir gêné un autre pilote.|Leblanc reçoit une pénalité pour avoir dépassé les limites de piste.|Sutter termine à moins de 5 secondes du vainqueur.|Leblanc termine à plus de 2 tours du vainqueur.|Sutter gagne avec une stratégie sous Safety Car.|Leblanc perd des positions après un problème avec ses pneus.`.split('|')],
-      FC: [...`AGL marque un but.|Abdoulaye marque un but.|AGL réalise une passe décisive.|Abdoulaye réalise une passe décisive.|AGL rate un penalty.|Abdoulaye rate un penalty.|AGL marque un doublé.|Abdoulaye marque un doublé.|AGL marque un triplé (hat-trick).|Abdoulaye marque un triplé (hat-trick).|AGL reçoit un carton jaune.|Abdoulaye reçoit un carton jaune.|AGL reçoit un carton rouge.|Abdoulaye reçoit un carton rouge.|AGL marque un but de la tête.|Abdoulaye marque un but de la tête.|AGL marque sur coup franc direct.|Abdoulaye marque sur coup franc direct.|AGL réussit une interception clé en défense.|Abdoulaye réussit une interception clé en défense.|AGL perd la balle en position dangereuse, menant à un but adverse.|Abdoulaye perd la balle en position dangereuse, menant à un but adverse.|AGL fait une passe clé qui mène au but d’un coéquipier.|Abdoulaye fait une passe clé qui mène au but d’un coéquipier.`.split('|')]
+      F1: [...`Sutter termine P5 ou mieux.|Sutter termine P10 ou mieux.|Sutter réalise le meilleur tour.|Sutter termine sur le podium (P3 ou mieux).|Sutter gagne une course.|Sutter abandonne à cause d’un problème moteur.|Sutter abandonne après un accident.|Sutter termine en dehors du top 10.|Sutter termine P15 ou pire.|Sutter dépasse Leblanc en course.|Sutter est dépassé par Leblanc.|Sutter rate la qualification pour Q3.|Sutter se qualifie en pole position.|Sutter termine P4.|Sutter termine P6.|Sutter termine P7.|Sutter termine P8.|Sutter termine P9.|Sutter termine dernier après un problème mécanique.|Sutter reçoit une pénalité de temps.|Sutter reçoit une pénalité sur grille pour changement de moteur.|Sutter est impliqué dans un accrochage avec Leblanc.|Sutter réalise une stratégie à un arrêt gagnante.|Sutter perd des positions après un arrêt au stand lent.|Sutter gagne des positions grâce à la stratégie sous Safety Car.|Sutter est éliminé en Q1 lors des qualifications.|Sutter est éliminé en Q2 lors des qualifications.|Sutter réalise un dépassement spectaculaire au virage 1.|Sutter est victime d’une crevaison en course.|Sutter termine à moins de 2 secondes du vainqueur.|Leblanc abandonne (DNF) à cause d’un problème moteur.|Leblanc abandonne après un accident au départ.|Leblanc termine dans les points (P10 ou mieux).|Leblanc termine hors des points (P11 ou pire).|Leblanc réalise le meilleur tour en course.|Leblanc se qualifie devant Sutter.|Leblanc est dépassé par plusieurs pilotes dans le dernier tour.|Leblanc termine P5 ou mieux.|Leblanc termine P15 ou pire après des problèmes techniques.|Leblanc reçoit une pénalité de temps pour non-respect des limites de piste.|Leblanc reçoit une pénalité sur grille pour changement de boîte de vitesses.|Leblanc gagne une course contre toute attente.|Leblanc réalise une stratégie sous Safety Car parfaite et gagne des places.|Leblanc perd plusieurs positions après un arrêt au stand raté.|Leblanc dépasse plusieurs pilotes dans les derniers tours pour finir dans les points.|Leblanc est impliqué dans un accrochage avec un autre pilote (pas avec Sutter).|Leblanc se qualifie en pole position pour la première fois de sa carrière.|Leblanc rate son départ et perd plusieurs places au premier tour.|Leblanc est éliminé en Q1 lors des qualifications après une erreur stratégique de l'équipe.|Leblanc est éliminé en Q2 lors des qualifications malgré un bon rythme en essais libres.|Sutter termine P1 et Leblanc P2.|Leblanc termine P10 et Sutter P11.|Sutter et Leblanc sont tous deux dans les points.|Sutter et Leblanc abandonnent tous deux.`.split('|')],
+      FC: [...`AGL marque un but.|Abdoulaye marque un but.|AGL réalise une passe décisive.|Abdoulaye réalise une passe décisive.|AGL rate un penalty.|Abdoulaye rate un penalty.|AGL marque un doublé.|Abdoulaye marque un doublé.|AGL marque un triplé (hat-trick).|Abdoulaye marque un triplé (hat-trick).|AGL reçoit un carton jaune.|Abdoulaye reçoit un carton jaune.|AGL reçoit un carton rouge.|Abdoulaye reçoit un carton rouge.|AGL marque un but de la tête.|Abdoulaye marque un but de la tête.|AGL marque sur coup franc direct.|Abdoulaye marque sur coup franc direct.`.split('|')]
     };
 
-    function drawWheel(options) {
-      const total = options.length;
-      const angle = 360 / total;
-      let colors = [];
-      let svg = '';
-      for (let i = 0; i < total; i++) {
-        const rotate = i * angle;
-        const color = `hsl(${rotate}, 70%, 50%)`;
-        const largeArc = angle > 180 ? 1 : 0;
-        const x = 250 + 250 * Math.cos((Math.PI * 2 * i) / total);
-        const y = 250 + 250 * Math.sin((Math.PI * 2 * i) / total);
-        const x2 = 250 + 250 * Math.cos((Math.PI * 2 * (i + 1)) / total);
-        const y2 = 250 + 250 * Math.sin((Math.PI * 2 * (i + 1)) / total);
-        svg += `<path d="M250,250 L${x},${y} A250,250 0 ${largeArc} 1 ${x2},${y2} Z" fill="${color}" stroke="#0e0e10" stroke-width="1" />`;
+    function drawWheel(segments) {
+      const radius = wheelCanvas.width / 2;
+      const angle = (2 * Math.PI) / segments.length;
+      ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+      for (let i = 0; i < segments.length; i++) {
+        const startAngle = i * angle;
+        const endAngle = (i + 1) * angle;
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.arc(radius, radius, radius, startAngle, endAngle);
+        ctx.fillStyle = `hsl(${(i * 360) / segments.length}, 80%, 50%)`;
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(startAngle + angle / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = "12px sans-serif";
+        ctx.fillText(segments[i].slice(0, 45), radius - 10, 5);
+        ctx.restore();
       }
-      wheel.innerHTML = svg;
     }
 
     function spinWheel() {
-      const options = data[wheelType.value];
-      const result = options[Math.floor(Math.random() * options.length)];
-      alert('🎯 Résultat : ' + result);
+      if (spinning) return;
+      spinning = true;
+      const segments = data[wheelType.value];
+      const segmentAngle = 360 / segments.length;
+      const randomIndex = Math.floor(Math.random() * segments.length);
+      const extraRotation = 360 * 5;
+      const targetAngle = (360 - randomIndex * segmentAngle) + extraRotation;
+
+      wheelCanvas.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+      wheelCanvas.style.transform = `rotate(${targetAngle + currentAngle}deg)`;
+
+      setTimeout(() => {
+        currentAngle = (currentAngle + targetAngle) % 360;
+        alert("🎯 Résultat : " + segments[randomIndex]);
+        spinning = false;
+      }, 4200);
     }
 
     drawWheel(data[wheelType.value]);
-    wheelType.addEventListener('change', () => drawWheel(data[wheelType.value]));
+    wheelType.addEventListener("change", () => drawWheel(data[wheelType.value]));
   </script>
 </body>
 </html>
