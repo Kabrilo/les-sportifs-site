@@ -109,8 +109,36 @@
       border-bottom: none;
     }
 
-    .tiktok-embed {
-      margin-top: 30px;
+    .form-section {
+      background-color: #1f1f23;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: none;
+      margin-bottom: 15px;
+      background-color: #2b2b30;
+      color: #f4f4f4;
+      font-size: 1em;
+    }
+
+    input[type="submit"] {
+      background-color: #9147ff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #772ce8;
     }
 
     footer {
@@ -186,6 +214,17 @@
       </blockquote>
       <script async src="https://www.tiktok.com/embed.js"></script>
     </section>
+
+    <section class="form-section">
+      <h2>🎯 Défi</h2>
+      <p>Propose un défi que tu aimerais voir réalisé en live !</p>
+      <form name="defi-form" method="POST" data-netlify="true">
+        <input type="hidden" name="form-name" value="defi-form">
+        <label for="suggestion">Suggestion de Défi :</label>
+        <textarea id="suggestion" name="Suggestion de Défi" rows="4" required></textarea>
+        <input type="submit" value="Envoyer le défi">
+      </form>
+    </section>
   </main>
 
   <footer>
@@ -196,6 +235,11 @@
       <a href="https://twitch.tv/lessportifs" target="_blank">Twitch</a>
     </div>
   </footer>
+
+  <!-- Formulaire fantôme pour Netlify detection -->
+  <form name="defi-form" netlify hidden>
+    <textarea name="Suggestion de Défi"></textarea>
+  </form>
 
 </body>
 </html>
